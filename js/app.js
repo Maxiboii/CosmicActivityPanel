@@ -26,8 +26,6 @@ function getDate(epoch) {
   }
 }
 
-
-// drawBody(earthSize, document.getElementById('canvas'))
 const [todayMonth, todayDate, todayYear] = new Date().toLocaleDateString("en-US").split("/")
 apiDate = todayYear + '-' + todayMonth + '-' + todayDate
 
@@ -35,7 +33,6 @@ const approachTime = []
 
 var request = new XMLHttpRequest()
 const apiKey = '5bbsCyWbCHbQfeQmEEd9e3jYjVwXRh8VGAiINvNr'
-// const daysHeading = document.getElementById('days')
 const content = document.getElementById('content')
 
 request.open('GET', 'https://api.nasa.gov/neo/rest/v1/feed?start_date=' +
@@ -53,10 +50,7 @@ request.onload = function () {
     const asteroidData = data['near_earth_objects']
   
     
-      for (let i in asteroidData) {
-          console.log(asteroidData[i])
-          
-
+      for (let i in asteroidData) {         
           for (let asteroid in asteroidData[i]) {
             const tr = document.createElement('tr')
             const name = document.createElement('td')
@@ -69,9 +63,11 @@ request.onload = function () {
             const laserButton = document.createElement('button')
             const laserSpan = document.createElement('span')
 
-            name.textContent = asteroidData[i][asteroid].name
+            const asteroidName = asteroidData[i][asteroid].name
+            name.textContent = asteroidName.slice(asteroidName.indexOf('(')+1,
+              asteroidName.indexOf('(')-1)
             tr.appendChild(name)
-            size.textContent = asteroidData[i][asteroid]['estimated_diameter'].kilometers['estimated_diameter_max']
+            size.textContent = asteroidData[i][asteroid]['estimated_diameter'].meters['estimated_diameter_max'].toFixed(1)
             tr.appendChild(size)
             if (asteroidData[i][asteroid].is_potentially_hazardous_asteroid == true) {
               isDangerous.textContent = 'YES'
@@ -85,23 +81,20 @@ request.onload = function () {
             approachTime.push(asteroidData[i][asteroid]['close_approach_data']['0']
             ['epoch_date_close_approach'])
             tr.appendChild(closeApproach)
-            drawBody(parseFloat(size.textContent) * 15000, bodyPictureCanvas)
+            drawBody(parseFloat(size.textContent) * 15, bodyPictureCanvas)
             bodyPicture.appendChild(bodyPictureCanvas)
             tr.appendChild(bodyPicture)
             laserButton.textContent = 'Laser it!'
+            laserButton.setAttribute('class', 'laser')
             laser.appendChild(laserButton)
             laserSpan.textContent = 'Just a joke'
+            laserSpan.setAttribute('class', 'joke')
             laser.appendChild(laserSpan)
             tr.appendChild(laser)
 
             content.appendChild(tr)
           }
-          
-          // content.innerHTML = asteroidData[i]
       }
-    // data.forEach((movie) => {
-    //   console.log(movie)
-    // })
     const countdown = document.getElementsByClassName('countdown')
     setInterval(() => {
       for (let i = 0; i < approachTime.length; i++ ){
@@ -111,6 +104,13 @@ request.onload = function () {
     
   } else {
     console.log('error')
+  }
+  const laserButtons = document.getElementsByClassName('laser')
+  for (let b of laserButtons) {
+    b.addEventListener('click', function (e) {
+      this.style.display = 'none'
+      this.nextSibling.style.display = 'inline'
+    })
   }
 }
 
