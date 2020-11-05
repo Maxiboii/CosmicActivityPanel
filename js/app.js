@@ -74,13 +74,13 @@ request.onload = function () {
             const laserSpan = document.createElement('span')
 
             const asteroidName = asteroidData[i][asteroid].name
-            name.textContent = asteroidName.slice(asteroidName.indexOf('(')+1,
-              asteroidName.indexOf('(')-1)
+            name.textContent = asteroidName.replace('(', '').replace(')', '')
             tr.appendChild(name)
             size.textContent = asteroidData[i][asteroid]['estimated_diameter'].meters['estimated_diameter_max'].toFixed(1)
             tr.appendChild(size)
             if (asteroidData[i][asteroid].is_potentially_hazardous_asteroid == true) {
               isDangerous.textContent = 'YES'
+              isDangerous.style.color = 'red'
             } else {
               isDangerous.textContent = 'NO'
             }
@@ -110,6 +110,9 @@ request.onload = function () {
     setInterval(() => {
       for (let i = 0; i < approachTime.length; i++ ){
         countdown[i].innerHTML = getDate(approachTime[i])
+        if (getDate(approachTime[i]) != 'passed' && countdown[i].previousElementSibling.innerHTML == 'YES') {
+          countdown[i].style.color = 'red'
+        }
       }
     }, 1000);
     
